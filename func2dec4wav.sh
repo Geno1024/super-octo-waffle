@@ -4,7 +4,7 @@
 tempfile=/tmp/`date +%s`
 
 # parse command line param
-while getopts f:o:s:l:hv opts; do
+while getopts f:o:r:s:l:hv opts; do
     case $opts in
         f) func=$OPTARG ;;
         o) output=$OPTARG ;;
@@ -13,6 +13,7 @@ while getopts f:o:s:l:hv opts; do
         h) cat << EOF
 Usage: $0 -f func [-o output.txt] [-s start] [-l length] [-h] [-v]
 Convert func to sample data, ready for parse by dec2wav.sh.
+Unit of parameter of -s and -l are related to sample rate.
 
 Sample:
 s(x*1000/22050*3.1415926)
@@ -23,7 +24,7 @@ exit -1
         v) cat << EOF
 Author: Geno1024
 Date: 2019-05-03
-Version: 00.01.0074
+Version: 00.01.0086
 EOF
 exit -1
 ;;
@@ -52,4 +53,4 @@ if [[ $length == "" ]]; then
     length=44100
 fi
 
-bc -l <<< "for (x = $start; x < ($start + $length); x++) { r = 32768 * ($func) * 0.7071067812; if (r < 0) r = 65536 + r; scale = 0; r / 1; scale = 20; }"
+bc -l <<< "for (x = $start; x < ($start + $length); x++) { r = 32768 * ($func) * 0.7071067812; if (r < 0) r = 65536 + r; scale = 0; r / 1; scale = 10; }"

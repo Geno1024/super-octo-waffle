@@ -4,12 +4,13 @@
 tempfile=/tmp/`date +%s`
 
 # parse command line param
-while getopts i:o:h opts; do
+while getopts i:o:r:h opts; do
     case $opts in
         i) input=$OPTARG ;;
         o) output=$OPTARG ;;
+        r) rate=$OPTARG ;;
         h) cat << EOF
-Usage: $0 [-i input.txt] [-o output.wav] [-h] [-v]
+Usage: $0 [-i input.txt] [-o output.wav] [-r rate] [-h] [-v]
 Convert numeric analog data to wav file.
 
 EOF
@@ -18,7 +19,7 @@ exit -1
         v) cat << EOF
 Author: Geno1024
 Date: 2019-05-02
-Version: 00.01.0074
+Version: 00.01.0084
 EOF
 ;;
         ?) ;;
@@ -38,6 +39,11 @@ fi
 # if have output then write stdout
 if [[ $output != "" ]]; then
     exec 1>"$output"
+fi
+
+# if no rate then rate 44100
+if [[ $rate == "" ]]; then
+    rate=44100
 fi
 
 channels=$(head -n 1 "$input" | awk '{print NF}')
@@ -69,13 +75,13 @@ echo -n "fmt "
 echo -ne "\x10\0\0\0"
 ## 01 00 audio format = PCM, hardcode
 echo -ne "\x01\0"
-## 01 00 number of channels, hardcode
+## 01 00 number of channels
 byte2tobe $channels
-## 44 ac 00 00 sample rate, hardcode
-byte4tobe 44100
-## 10 b1 02 00 byte rate, hardcode
-byte4tobe $((44100 * $channels * 2))
-## 04 00 block align, hardcode
+## 44 ac 00 00 sample rate
+byte4tobe $rate
+## 10 b1 02 00 byte rate
+byte4tobe $(($rate * $channels * 2))
+## 04 00 block align
 byte2tobe $(($channels * 2))
 ## 10 00 bits per sample, hardcode
 echo -ne "\x10\0"
