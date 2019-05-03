@@ -4,7 +4,7 @@
 tempfile=/tmp/`date +%s`
 
 # parse command line param
-while getopts :i:o:h opts; do
+while getopts i:o:h opts; do
     case $opts in
         i) input=$OPTARG ;;
         o) output=$OPTARG ;;
@@ -23,6 +23,8 @@ Author: Geno1024
 Date: 2019-05-02
 Version: 00.01.0055
 EOF
+exit -1
+;;
         ?) ;;
     esac
 done
